@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kavach Health Preview</title>
+    <style>
+      :root {
+        --bg: #f4f9ff;
+        --card: #ffffff;
+        --primary: #1f5cff;
+        --text: #10233f;
+        --muted: #5a6b82;
+        --border: #dfe8f5;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        background: linear-gradient(135deg, #eef7ff 0%, #f8fbff 100%);
+        color: var(--text);
+      }
+      .shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .hero {
+        background: linear-gradient(120deg, var(--primary), #5ba4ff);
+        color: white;
+        border-radius: 28px;
+        padding: 30px;
+        box-shadow: 0 20px 45px rgba(31, 92, 255, 0.2);
+      }
+      .hero h1 { margin: 0 0 8px; font-size: 34px; }
+      .hero p { margin: 0; font-size: 16px; opacity: 0.95; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+        margin-top: 20px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 18px;
+        box-shadow: 0 10px 24px rgba(16, 35, 63, 0.06);
+      }
+      .card h3 { margin: 0 0 8px; font-size: 18px; }
+      .card p { margin: 0 0 10px; color: var(--muted); line-height: 1.5; font-size: 13px; }
+      .pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #eef4ff;
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .stats {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .stat {
+        background: #f8fbff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+      .footer {
+        text-align: center;
+        color: var(--muted);
+        margin-top: 24px;
+        font-size: 13px;
+      }
+      @media (max-width: 700px) {
+        .hero h1 { font-size: 26px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="hero">
+        <h1>Kavach Health</h1>
+        <p>A complete healthcare platform preview with patient flow, staff dashboards, AI support, payments, emergency guidance, deployment readiness, and a new Module Hub entry point.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <span class="pill">Patient Journey</span>
+          <h3>Registration & Booking</h3>
+          <p>Patient onboarding, OCR-assisted registration, appointment booking, and digital token generation.</p>
+          <div class="stats">
+            <div class="stat">OCR Register</div>
+            <div class="stat">Book Visit</div>
+            <div class="stat">Digital Token</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="pill">Operations</span>
+          <h3>Live Queue & Reception</h3>
+          <p>Track current token, patient position, waiting time, and manage reception workflow.</p>
+          <div class="stats">
+            <div class="stat">Live Queue</div>
+            <div class="stat">Reception Desk</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="pill">Clinical</span>
+          <h3>Doctor & Hospital Admin</h3>
+          <p>Doctor dashboard for case progress and hospital admin views for ward occupancy and demand.</p>
+          <div class="stats">
+            <div class="stat">Doctor Dashboard</div>
+            <div class="stat">Hospital Admin</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="pill">Platform</span>
+          <h3>Partner & Super Admin</h3>
+          <p>Coordinate network partners and monitor governance, approvals, and platform health.</p>
+          <div class="stats">
+            <div class="stat">Partner Portal</div>
+            <div class="stat">Super Admin</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="pill">Care Continuity</span>
+          <h3>Health Records & Payments</h3>
+          <p>View medical history timelines, manage payments, and settle pending invoices securely.</p>
+          <div class="stats">
+            <div class="stat">Health Records</div>
+            <div class="stat">Payments</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="pill">Support</span>
+          <h3>AI Assistant & Emergency</h3>
+          <p>Get support guidance, emergency action steps, and rollout-ready deployment info.</p>
+          <div class="stats">
+            <div class="stat">AI Assistant</div>
+            <div class="stat">Emergency</div>
+            <div class="stat">Deployment</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="pill">Overview</span>
+          <h3>All Modules Included</h3>
+          <p>Marketplace, doctors, registration, OCR, booking, tokens, queue, reception, admin tools, payments, records, AI, emergency, and deployment.</p>
+          <div class="stats">
+            <div class="stat">Module Hub</div>
+            <div class="stat">Full Flow</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">This preview is ready to open locally in your browser.</div>
+    </div>
+  </body>
+</html>
