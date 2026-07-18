@@ -4,22 +4,34 @@ import { useTheme } from '../theme/ThemeContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import StatusBanner from '../components/StatusBanner';
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../services/firebase";
 
 export default function LiveQueueScreen() {
+  const [currentToken, setCurrentToken] = useState("A001");
+const [currentNumber, setCurrentNumber] = useState(1);
   const { colors } = useTheme();
-  const [currentToken, setCurrentToken] = useState('A-204');
+ 
   const [yourToken, setYourToken] = useState('A-204');
   const [patientsAhead, setPatientsAhead] = useState(4);
   const [waitingTime, setWaitingTime] = useState('18 mins');
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPatientsAhead((prev) => Math.max(0, prev - 1));
-      setWaitingTime(`${Math.max(5, 18 - (4 - Math.max(0, patientsAhead - 1))) } mins`);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [patientsAhead]);
+ useEffect(() => {
+  const unsubscribe = onSnapshot(
+    doc(db, "liveQueue", "Apollo"),
+    (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+
+        setCurrentToken(data.currentNumber);
+        setCurrentNumber(data.currentToken);
+      }
+    }
+  );
+
+  return unsubscribe;
+}, []);
 
   const refreshQueue = () => {
     setCurrentToken(`A-${Math.floor(100 + Math.random() * 900)}`);
@@ -28,6 +40,13 @@ export default function LiveQueueScreen() {
     setWaitingTime('18 mins');
     setMessage('Queue synchronized successfully.');
   };
+  useEffect(() => {
+  const interval = setInterval(() => {
+    setPatientsAhead((prev) => Math.max(0, prev - 1));
+  }, 8000);
+
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 

@@ -4,6 +4,7 @@ import { useTheme } from '../theme/ThemeContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import StatusBanner from '../components/StatusBanner';
+import { nextPatient } from "../services/queueService";
 
 type VisitItem = {
   token: string;
@@ -54,6 +55,10 @@ export default function DoctorDashboardScreen() {
               <Text style={[styles.status, { color: colors.primary }]}>Status: {visit.status}</Text>
             </View>
             <Button title="Update" onPress={() => updateVisit(visit.token)} variant="secondary" />
+              <Button
+  title="Next Patient"
+  onPress={nextPatient}
+/>
           </View>
         ))}
       </Card>
