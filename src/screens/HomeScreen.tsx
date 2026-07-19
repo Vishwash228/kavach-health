@@ -5,6 +5,13 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import RoleChip from '../components/RoleChip';
 import { authService, AuthSession } from '../services/auth';
+import FeaturedDoctors from "../components/FeaturedDoctors";
+import SpecialtiesGrid from "../components/SpecialtiesGrid";
+import EmergencyCard from "../components/EmergencyCard";
+import HealthTips from "../components/HealthTips";
+import NotificationsCard from "../components/NotificationsCard";
+import MedicineReminder from "../components/MedicineReminder";
+import InsuranceCard from "../components/InsuranceCard";
 
 type HomeScreenProps = {
   onSignOut: () => void;
@@ -67,21 +74,136 @@ export default function HomeScreen({ onSignOut, onOpenMarketplace, onOpenDoctors
   ];
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
-      <View style={styles.header}>
-        <Text style={[styles.greeting, { color: colors.text }]}>Hello, {session?.user.name ?? 'Patient'}</Text>
-        <Text style={[styles.sub, { color: colors.muted }]}>Your secure healthcare workspace is ready.</Text>
-        <RoleChip label={session?.user.role ?? 'patient'} />
-      </View>
+    <ScrollView 
+  style={[
+    styles.container,
+    { backgroundColor: colors.background }
+  ]}
+>
 
-      <Card style={{ marginBottom: 14 }}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>Authentication Status</Text>
-        <Text style={[styles.cardText, { color: colors.muted }]}>Signed in securely with session persistence and protected access.</Text>
-      </Card>
-      <Card style={{ marginBottom: 14 }}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>Smart OPD</Text>
-        <Text style={[styles.cardText, { color: colors.muted }]}>Track queues, digital tokens, and live consultation data from one workspace.</Text>
-      </Card>
+<View
+  style={[
+    styles.hero,
+    {
+      backgroundColor: colors.primary,
+    },
+  ]}
+>
+  <Text style={styles.heroGreeting}>
+    👋 Good Morning
+  </Text>
+
+  <Text style={styles.heroName}>
+    {session?.user.name ?? "Patient"}
+  </Text>
+
+  <Text style={styles.heroSub}>
+    Stay healthy. Your healthcare is just one tap away.
+  </Text>
+
+  <RoleChip label={session?.user.role ?? "patient"} />
+
+</View>
+<View
+  style={[
+    styles.searchBox,
+    {
+      
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+  ]}
+>
+  <Text style={{ color: colors.muted }}>
+    🔍 Search doctors, hospitals...
+  </Text>
+<Card style={styles.quickCard}>
+
+<Text style={[styles.cardTitle,{color:colors.text}]}>
+  Quick Actions
+</Text>
+
+<View style={styles.grid}>
+
+<Button 
+title="📅 Book"
+onPress={onOpenBooking}
+/>
+
+<Button 
+title="🏥 Hospitals"
+onPress={onOpenMarketplace}
+/>
+
+<Button 
+title="🎟 Token"
+onPress={onOpenToken}
+/>
+
+<Button 
+title="🚑 Emergency"
+onPress={onOpenEmergency}
+/>
+
+</View>
+
+</Card>
+<Card style={{ marginBottom: 20 }}>
+
+  <Text style={[styles.cardTitle, { color: colors.text }]}>
+    Upcoming Appointment
+  </Text>
+
+  <Text style={styles.hospitalName}>
+    Dr. Neha Singh
+  </Text>
+
+  <Text style={[styles.cardText, { color: colors.muted }]}>
+    🏥 Apollo Hospital
+  </Text>
+
+  <Text style={[styles.cardText, { color: colors.muted }]}>
+    📅 Today • ⏰ 09:00 AM
+  </Text>
+
+  <Text style={[styles.cardText, { color: colors.muted }]}>
+    🎟 Token: A001
+  </Text>
+
+  <View style={{ marginTop: 15 }}>
+    <Button
+      title="Join Video Consultation"
+      onPress={onOpenAi}
+    />
+  </View>
+
+</Card>
+<Card style={{ marginBottom: 20 }}>
+
+  <Text style={[styles.cardTitle, { color: colors.text }]}>
+    📊 Health Summary
+  </Text>
+  <FeaturedDoctors onBook={onOpenBooking} />
+  <View style={styles.statsRow}>
+
+    <View style={styles.statBox}>
+      <Text style={styles.statValue}>12</Text>
+      <Text style={styles.statLabel}>Visits</Text>
+    </View>
+
+    <View style={styles.statBox}>
+      <Text style={styles.statValue}>3</Text>
+      <Text style={styles.statLabel}>Reports</Text>
+    </View>
+
+    <View style={styles.statBox}>
+      <Text style={styles.statValue}>2</Text>
+      <Text style={styles.statLabel}>Medicines</Text>
+    </View>
+
+  </View>
+
+</Card>
       <View style={styles.actions}>
         <Button title="View Hospitals" onPress={onOpenMarketplace} />
         <Button title="Find Doctors" onPress={onOpenDoctors} variant="secondary" />
@@ -128,9 +250,49 @@ export default function HomeScreen({ onSignOut, onOpenMarketplace, onOpenDoctors
           </View>
         ))}
       </Card>
+       <Card style={{ marginBottom: 20 }}>
 
+  <Text style={[styles.cardTitle, { color: colors.text }]}>
+    👨‍⚕️ Featured Doctors
+  </Text>
+  <SpecialtiesGrid onSelect={onOpenDoctors} />
+  <Card style={styles.doctorCard}>
+    <Text style={styles.doctorName}>Dr. Neha Singh</Text>
+    <Text style={[styles.cardText, { color: colors.muted }]}>
+      Cardiologist • ⭐ 4.9
+    </Text>
+
+    <View style={{ marginTop: 10 }}>
+      <Button
+        title="Book Appointment"
+        onPress={onOpenBooking}
+      />
+    </View>
+  </Card>
+
+  <Card style={styles.doctorCard}>
+    <Text style={styles.doctorName}>Dr. Raj Verma</Text>
+    <Text style={[styles.cardText, { color: colors.muted }]}>
+      Orthopedic • ⭐ 4.8
+    </Text>
+
+    <View style={{ marginTop: 10 }}>
+      <Button
+        title="Book Appointment"
+        onPress={onOpenBooking}
+      />
+    </View>
+  </Card>
+
+</Card>
+<EmergencyCard onEmergency={onOpenEmergency} />
+<HealthTips />
+<NotificationsCard />
+<MedicineReminder />
+<InsuranceCard />
       <View style={styles.actions}>
         <Button title="Sign Out" onPress={handleSignOut} variant="secondary" />
+      </View>
       </View>
     </ScrollView>
   );
@@ -141,6 +303,56 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  doctorCard: {
+  marginTop: 15,
+},
+
+doctorName: {
+  fontSize: 18,
+  fontWeight: "700",
+},
+  hospitalName: {
+  fontSize: 18,
+  fontWeight: "700",
+  marginBottom: 8,
+},
+  searchBox: {
+  padding: 16,
+  borderRadius: 16,
+  borderWidth: 1,
+  marginBottom: 20,
+},
+  quickCard: {
+  marginBottom: 20,
+},
+
+grid: {
+  gap: 12,
+},
+  hero: {
+  borderRadius: 22,
+  padding: 24,
+  marginBottom: 20,
+},
+heroGreeting: {
+  color: "#fff",
+  fontSize: 18,
+  fontWeight: "600",
+},
+
+heroName: {
+  color: "#fff",
+  fontSize: 30,
+  fontWeight: "800",
+  marginTop: 6,
+},
+
+heroSub: {
+  color: "#fff",
+  marginTop: 10,
+  marginBottom: 14,
+  fontSize: 15,
+},
   header: {
     marginBottom: 20,
   },
@@ -167,4 +379,24 @@ const styles = StyleSheet.create({
   moduleItem: {
     marginTop: 8,
   },
+  statsRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: 15,
+},
+
+statBox: {
+  flex: 1,
+  alignItems: "center",
+},
+
+statValue: {
+  fontSize: 26,
+  fontWeight: "800",
+},
+
+statLabel: {
+  marginTop: 6,
+  fontSize: 14,
+},
 });

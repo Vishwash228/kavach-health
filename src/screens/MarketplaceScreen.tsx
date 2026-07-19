@@ -3,55 +3,11 @@ import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 
 import { useTheme } from '../theme/ThemeContext';
 import HospitalCardView, { HospitalCardData } from '../components/HospitalCard';
 import { HospitalDetailData } from './HospitalDetailsScreen';
+import { useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 
-const hospitals: HospitalCardData[] = [
- {
-  id: '1',
-  name: 'Kavach Super Specialty',
-  city: 'Mumbai',
-  rating: 4.8,
-  reviews: 1240,
-  consultationFee: 800,
-  distanceKm: 3.2,
-  waitingTime: 18,
-  emergencyAvailable: true,
-  isGovernment: false,
-  insuranceAccepted: true,
-  department: 'Cardiology',
-  disease: 'Heart Care',
-  image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=900',
-},
-  {
-    id: '2',
-    name: 'City Care Government Hospital',
-    city: 'Delhi',
-    rating: 4.5,
-    reviews: 890,
-    consultationFee: 300,
-    distanceKm: 7.5,
-    waitingTime: 27,
-    emergencyAvailable: true,
-    isGovernment: true,
-    insuranceAccepted: false,
-    department: 'Neurology',
-    disease: 'Stroke Recovery',
-  },
-  {
-    id: '3',
-    name: 'Arogya MultiSpecialty',
-    city: 'Bengaluru',
-    rating: 4.7,
-    reviews: 610,
-    consultationFee: 650,
-    distanceKm: 2.1,
-    waitingTime: 12,
-    emergencyAvailable: true,
-    isGovernment: false,
-    insuranceAccepted: true,
-    department: 'Orthopedics',
-    disease: 'Joint Care',
-  },
-];
+
 
 type SortOption = 'distance' | 'rating' | 'waiting';
 
@@ -62,9 +18,48 @@ type MarketplaceScreenProps = {
 };
 
 export default function MarketplaceScreen({ onSelectHospital }: MarketplaceScreenProps) {
+  const [hospitals, setHospitals] = useState<HospitalCardData[]>([]);
   const { colors } = useTheme();
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('distance');
+  useEffect(() => {
+  loadHospitals();
+}, []);
+
+const loadHospitals = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, "hospitals"));
+
+    const data: HospitalCardData[] = snapshot.docs.map((doc) => {
+  const item = doc.data();
+
+  return {
+    id: doc.id,
+    name: item.hospitalName,
+    city: item.city,
+    rating: item.rating,
+    image: item.image,
+
+    speciality: item.speciality,
+
+    reviews: 1000,
+    consultationFee: 500,
+    distanceKm: 2.5,
+    waitingTime: 15,
+    emergencyAvailable: true,
+    isGovernment: false,
+    insuranceAccepted: true,
+
+    department: item.speciality,
+    disease: "General Care",
+  };
+});;
+
+    setHospitals(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
   const filteredHospitals = useMemo(() => {
