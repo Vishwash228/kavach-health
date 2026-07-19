@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Button from './Button';
 import { useTheme } from '../theme/ThemeContext';
 import Card from './Card';
 
@@ -46,6 +47,14 @@ export default function DoctorCardView({ doctor, onPress }: DoctorCardProps) {
         <Text style={[styles.meta, { color: colors.muted }]}>Experience: {doctor.experienceYears} years</Text>
         <Text style={[styles.meta, { color: colors.muted }]}>Languages: {doctor.languages.join(', ')}</Text>
         <Text style={[styles.meta, { color: colors.muted }]}>Availability: {doctor.availability}</Text>
+        <View style={styles.actionRow}>
+  <Text style={styles.verified}>✅ Verified</Text>
+
+  <Button
+    title="Book Now"
+    onPress={() => {}}
+  />
+</View>
       </Card>
     </TouchableOpacity>
   );
@@ -55,6 +64,18 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 12,
   },
+  actionRow: {
+  marginTop: 12,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+
+verified: {
+  color: '#2E7D32',
+  fontWeight: '700',
+  fontSize: 14,
+},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
