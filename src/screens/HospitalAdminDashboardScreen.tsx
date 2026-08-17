@@ -5,6 +5,10 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import StatusBanner from '../components/StatusBanner';
 
+import HeaderBar from '../components/HeaderBar';
+import { useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../services/firebase";
 type WardItem = {
   name: string;
   occupancy: number;
@@ -12,7 +16,11 @@ type WardItem = {
   status: 'Stable' | 'High Demand';
 };
 
-export default function HospitalAdminDashboardScreen() {
+type HospitalAdminDashboardScreenProps = {
+  onBack?: () => void;
+};
+
+export default function HospitalAdminDashboardScreen({ onBack }: HospitalAdminDashboardScreenProps = {}) {
   const { colors } = useTheme();
   const [message, setMessage] = useState('');
   const [wards, setWards] = useState<WardItem[]>([
@@ -20,6 +28,27 @@ export default function HospitalAdminDashboardScreen() {
     { name: 'General Ward', occupancy: 18, capacity: 24, status: 'Stable' },
     { name: 'Pediatrics', occupancy: 10, capacity: 12, status: 'Stable' },
   ]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  useEffect(() => {
+  const loadAppointments = async () => {
+    try {
+      const snapshot = await getDocs(
+        collection(db, "appointments")
+      );
+
+      const list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setAppointments(list);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  loadAppointments();
+}, []);
 
   const summary = useMemo(() => {
     const totalOccupied = wards.reduce((sum, ward) => sum + ward.occupancy, 0);
@@ -39,7 +68,9 @@ export default function HospitalAdminDashboardScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <HeaderBar title="Hospital Admin" onBack={onBack} subtitle="Ward occupancy & capacity" />
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
       <Text style={[styles.title, { color: colors.text }]}>Hospital Admin Dashboard</Text>
       <Text style={[styles.subtitle, { color: colors.muted }]}>Manage capacity, monitor wards, and respond to demand in real time.</Text>
 
@@ -50,7 +81,23 @@ export default function HospitalAdminDashboardScreen() {
         <Text style={[styles.meta, { color: colors.primary }]}>Occupied: {summary.totalOccupied} / {summary.totalCapacity}</Text>
         <Text style={[styles.meta, { color: colors.muted }]}>High Demand Wards: {summary.highDemand}</Text>
       </Card>
+      <Card style={styles.card}>
+  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+    Today's Appointments
+  </Text>
 
+  <Text
+    style={{
+      fontSize: 30,
+      fontWeight: "800",
+      color: colors.primary,
+    }}
+  >
+    {appointments.length}
+  </Text>
+
+  <Text>Total Bookings</Text>
+</Card>
       <Card style={styles.card}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Ward Status</Text>
         {wards.map((ward) => (
@@ -64,7 +111,38 @@ export default function HospitalAdminDashboardScreen() {
           </View>
         ))}
       </Card>
+     <Card style={styles.card}>
+  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+    Recent Appointments
+  </Text>
+
+  {appointments.slice(0, 5).map((item) => (
+    <View
+      key={item.id}
+      style={{
+        marginBottom: 12,
+      }}
+    >
+      <Text style={{ fontWeight: "700" }}>
+        {item.patientName || "Guest User"}
+      </Text>
+
+      <Text>
+        🏥 {item.hospitalName}
+      </Text>
+
+      <Text>
+        👨‍⚕️ {item.doctorName}
+      </Text>
+
+      <Text>
+        📅 {item.date} • {item.time}
+      </Text>
+    </View>
+  ))}
+</Card> 
     </ScrollView>
+    </View>
   );
 }
 

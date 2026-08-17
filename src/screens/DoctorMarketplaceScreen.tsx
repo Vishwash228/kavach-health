@@ -45,7 +45,17 @@ const doctors: DoctorCardData[] = [
   },
 ];
 
-export default function DoctorMarketplaceScreen() {
+import HeaderBar from '../components/HeaderBar';
+
+type DoctorMarketplaceScreenProps = {
+  onBack?: () => void;
+  onBookAppointment?: () => void;
+};
+
+export default function DoctorMarketplaceScreen({
+  onBack,
+  onBookAppointment,
+}: DoctorMarketplaceScreenProps = {}) {
   const { colors } = useTheme();
   const [query, setQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<'All' | 'Cardiologist' | 'Neurologist' | 'Orthopedic Surgeon'>('All');
@@ -59,9 +69,9 @@ export default function DoctorMarketplaceScreen() {
   }, [query, selectedSpecialty]);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
-      <Text style={[styles.title, { color: colors.text }]}>Doctor Marketplace</Text>
-      <Text style={[styles.subtitle, { color: colors.muted }]}>Search doctors, compare expertise, and book appointments with trusted specialists.</Text>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <HeaderBar title="Doctor Marketplace" onBack={onBack} subtitle="Search doctors & specialists" />
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
 
       <TextInput
         value={query}
@@ -84,9 +94,13 @@ export default function DoctorMarketplaceScreen() {
       </View>
 
       {filteredDoctors.map((doctor) => (
-        <DoctorCardView key={doctor.id} doctor={doctor} />
-      ))}
+  <DoctorCardView
+    key={doctor.id}
+    doctor={doctor}
+  />
+))}
     </ScrollView>
+    </View>
   );
 }
 

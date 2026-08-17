@@ -5,12 +5,18 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import StatusBanner from '../components/StatusBanner';
 
+import HeaderBar from '../components/HeaderBar';
+
 type ChatMessage = {
   role: 'assistant' | 'user';
   text: string;
 };
 
-export default function AiAssistantScreen() {
+type AiAssistantScreenProps = {
+  onBack?: () => void;
+};
+
+export default function AiAssistantScreen({ onBack }: AiAssistantScreenProps = {}) {
   const { colors } = useTheme();
   const [message, setMessage] = useState('');
   const [chat, setChat] = useState<ChatMessage[]>([
@@ -26,23 +32,23 @@ export default function AiAssistantScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
-      <Text style={[styles.title, { color: colors.text }]}>AI Health Assistant</Text>
-      <Text style={[styles.subtitle, { color: colors.muted }]}>Get instant support for common health questions, triage suggestions, and next-step guidance.</Text>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <HeaderBar title="AI Health Assistant" onBack={onBack} subtitle="Instant health guidance & triage" />
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
+        {message ? <StatusBanner message={message} tone="success" /> : null}
 
-      {message ? <StatusBanner message={message} tone="success" /> : null}
+        <Card style={styles.card}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Conversation</Text>
+          {chat.map((item, index) => (
+            <View key={`${item.role}-${index}`} style={[styles.bubble, item.role === 'assistant' ? styles.assistant : styles.user]}>
+              <Text style={[styles.bubbleText, { color: item.role === 'assistant' ? colors.text : '#fff' }]}>{item.text}</Text>
+            </View>
+          ))}
+        </Card>
 
-      <Card style={styles.card}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Conversation</Text>
-        {chat.map((item, index) => (
-          <View key={`${item.role}-${index}`} style={[styles.bubble, item.role === 'assistant' ? styles.assistant : styles.user]}>
-            <Text style={[styles.bubbleText, { color: item.role === 'assistant' ? colors.text : '#fff' }]}>{item.text}</Text>
-          </View>
-        ))}
-      </Card>
-
-      <Button title="Ask Assistant" onPress={askAssistant} />
-    </ScrollView>
+        <Button title="Ask Assistant" onPress={askAssistant} />
+      </ScrollView>
+    </View>
   );
 }
 

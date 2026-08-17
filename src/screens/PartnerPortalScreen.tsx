@@ -5,21 +5,48 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import StatusBanner from '../components/StatusBanner';
 
+import HeaderBar from '../components/HeaderBar';
+import { useEffect } from "react";
+import {
+  collection,
+  getDocs,
+} from "firebase/firestore";
+
+import { db } from "../services/firebase";
 type PartnerItem = {
   name: string;
   type: string;
   status: 'Connected' | 'Pending';
 };
 
-export default function PartnerPortalScreen() {
+type PartnerPortalScreenProps = {
+  onBack?: () => void;
+};
+
+export default function PartnerPortalScreen({ onBack }: PartnerPortalScreenProps = {}) {
   const { colors } = useTheme();
   const [message, setMessage] = useState('');
-  const [partners, setPartners] = useState<PartnerItem[]>([
-    { name: 'City Care Clinic', type: 'Primary Care', status: 'Connected' },
-    { name: 'Sunrise Diagnostics', type: 'Lab Partner', status: 'Connected' },
-    { name: 'Northview Pharmacy', type: 'Medication Partner', status: 'Pending' },
-  ]);
+  const [partners, setPartners] = useState<any[]>([]);
+  useEffect(() => {
+  const loadPartners = async () => {
+    try {
+      const snapshot = await getDocs(
+        collection(db, "partners")
+      );
 
+      const list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setPartners(list);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  loadPartners();
+}, []);
   const togglePartner = (name: string) => {
     setPartners((current) =>
       current.map((partner) => {
@@ -32,7 +59,9 @@ export default function PartnerPortalScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <HeaderBar title="Partner Portal" onBack={onBack} subtitle="Clinics, labs & pharmacy network" />
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
       <Text style={[styles.title, { color: colors.text }]}>Partner Portal</Text>
       <Text style={[styles.subtitle, { color: colors.muted }]}>Coordinate partner clinics, labs, and pharmacies through shared care referrals.</Text>
 
@@ -41,17 +70,38 @@ export default function PartnerPortalScreen() {
       <Card style={styles.card}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Partner Network</Text>
         {partners.map((partner) => (
-          <View key={partner.name} style={styles.partnerRow}>
+          <View key={partner.id} style={styles.partnerRow}>
             <View style={{ flex: 1 }}>
               <Text style={[styles.partnerName, { color: colors.text }]}>{partner.name}</Text>
-              <Text style={[styles.partnerMeta, { color: colors.muted }]}>{partner.type}</Text>
-              <Text style={[styles.status, { color: colors.primary }]}>Status: {partner.status}</Text>
+              <Text style={[styles.partnerMeta, { color: colors.muted }]}>{partner.city}</Text>
+              <Text style={[styles.status, { color: colors.primary }]}>Status: {partner.status||"pending"}</Text>
             </View>
             <Button title="Toggle" onPress={() => togglePartner(partner.name)} variant="secondary" />
           </View>
         ))}
       </Card>
+      <Card style={styles.card}>
+  <Text
+    style={[
+      styles.sectionTitle,
+      { color: colors.text },
+    ]}
+  >
+    Total Partners
+  </Text>
+
+  <Text
+    style={{
+      fontSize: 34,
+      fontWeight: "800",
+      color: colors.primary,
+    }}
+  >
+    {partners.length}
+  </Text>
+</Card>
     </ScrollView>
+    </View>
   );
 }
 

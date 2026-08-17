@@ -20,7 +20,7 @@ import PartnerPortalScreen from './src/screens/PartnerPortalScreen';
 import SuperAdminScreen from './src/screens/SuperAdminScreen';
 import HealthRecordsScreen from './src/screens/HealthRecordsScreen';
 import PaymentsScreen from './src/screens/PaymentsScreen';
-import AiAssistantScreen from './src/screens/AiAssistantScreen';
+import AISymptomCheckerScreen from './src/screens/AISymptomCheckerScreen';
 import EmergencyScreen from './src/screens/EmergencyScreen';
 import DeploymentScreen from './src/screens/DeploymentScreen';
 import ModuleHubScreen from './src/screens/ModuleHubScreen';
@@ -52,7 +52,6 @@ export default function App() {
   | 'emergency'
   | 'deployment'
   | 'moduleHub'
-  | 'patientDashboard'
 >('splash');
   const [selectedHospital, setSelectedHospital] = useState<HospitalDetailData | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
@@ -71,44 +70,54 @@ export default function App() {
     loadSession();
   }, []);
 
-  if (!sessionReady && screen === 'splash') {
-    return (
-      <ThemeProvider>
-        <StatusBar style="light" />
-        <SplashScreen onComplete={() => setScreen('welcome')} />
-      </ThemeProvider>
-    );
-  }
+  if (!sessionReady) {
+  return (
+    <ThemeProvider>
+      <StatusBar style="light" />
+      <SplashScreen onComplete={() => {}} />
+    </ThemeProvider>
+  );
+}
 
   return (
     <ThemeProvider>
       <StatusBar style="light" />
       {screen === 'welcome' && <WelcomeScreen onContinue={() => setScreen('auth')} />}
-      {screen === 'auth' && <AuthScreen onSuccess={() => setScreen('patientDashboard')} />}
+      {screen === 'auth' && <AuthScreen onSuccess={() => setScreen('home')} />}
       {screen === 'home' && <HomeScreen onSignOut={() => setScreen('auth')} onOpenMarketplace={() => setScreen('marketplace')} onOpenDoctors={() => setScreen('doctors')} onOpenRegistration={() => setScreen('registration')} onOpenOcr={() => setScreen('ocr')} onOpenBooking={() => setScreen('booking')} onOpenToken={() => setScreen('token')} onOpenQueue={() => setScreen('queue')} onOpenReception={() => setScreen('reception')} onOpenDoctorDashboard={() => setScreen('doctorDashboard')} onOpenHospitalAdmin={() => setScreen('hospitalAdmin')} onOpenPartner={() => setScreen('partner')} onOpenSuperAdmin={() => setScreen('superAdmin')} onOpenRecords={() => setScreen('records')} onOpenPayments={() => setScreen('payments')} onOpenAi={() => setScreen('ai')} onOpenEmergency={() => setScreen('emergency')} onOpenDeployment={() => setScreen('deployment')} onOpenModuleHub={() => setScreen('moduleHub')} />}
-      <AuthScreen onSuccess={() => setScreen('home')} />
-      {screen === 'marketplace' && <MarketplaceScreen onSelectHospital={(hospital) => { setSelectedHospital(hospital); setScreen('hospitalDetails'); }} />}
+      {screen === 'marketplace' && <MarketplaceScreen onBack={() => setScreen('home')} onSelectHospital={(hospital) => { setSelectedHospital(hospital); setScreen('hospitalDetails'); }} />}
       {screen === 'hospitalDetails' && selectedHospital ? <HospitalDetailsScreen hospital={selectedHospital} onBack={() => setScreen('marketplace')} /> : null}
-      {screen === 'doctors' && <DoctorMarketplaceScreen />}
-      {screen === 'registration' && <PatientRegistrationScreen />}
-      {screen === 'ocr' && <OcrRegistrationScreen />}
-      {screen === 'booking' && (
-       <AppointmentBookingScreen 
-         onOpenToken={() => setScreen('token')}
+      {screen === 'doctors' && (
+  <DoctorMarketplaceScreen
+    onBack={() => setScreen('home')}
+    onBookAppointment={() => setScreen('booking')}
   />
 )}
-      {screen === 'token' && <DigitalTokenScreen />}
-      {screen === 'queue' && <LiveQueueScreen />}
-      {screen === 'reception' && <ReceptionDashboardScreen />}
-      {screen === 'doctorDashboard' && <DoctorDashboardScreen />}
-      {screen === 'hospitalAdmin' && <HospitalAdminDashboardScreen />}
-      {screen === 'partner' && <PartnerPortalScreen />}
-      {screen === 'superAdmin' && <SuperAdminScreen />}
-      {screen === 'records' && <HealthRecordsScreen />}
-      {screen === 'payments' && <PaymentsScreen />}
-      {screen === 'ai' && <AiAssistantScreen />}
-      {screen === 'emergency' && <EmergencyScreen />}
-      {screen === 'deployment' && <DeploymentScreen />}
+      {screen === 'registration' && <PatientRegistrationScreen onBack={() => setScreen('home')} />}
+      {screen === 'ocr' && <OcrRegistrationScreen onBack={() => setScreen('home')} />}
+      {screen === 'booking' && <AppointmentBookingScreen onBack={() => setScreen('home')} onOpenToken={() => setScreen('token')} />}
+      {screen === 'token' && (
+  <DigitalTokenScreen
+    onBack={() => setScreen('home')}
+    onOpenQueue={() => setScreen('queue')}
+  />
+)}
+      {screen === 'queue' && <LiveQueueScreen onBack={() => setScreen('home')} />}
+      {screen === 'reception' && <ReceptionDashboardScreen onBack={() => setScreen('home')} />}
+      {screen === 'doctorDashboard' && <DoctorDashboardScreen onBack={() => setScreen('home')} />}
+      {screen === 'hospitalAdmin' && <HospitalAdminDashboardScreen onBack={() => setScreen('home')} />}
+      {screen === 'partner' && <PartnerPortalScreen onBack={() => setScreen('home')} />}
+      {screen === 'superAdmin' && <SuperAdminScreen onBack={() => setScreen('home')} />}
+      {screen === 'records' && <HealthRecordsScreen onBack={() => setScreen('home')} />}
+      {screen === 'payments' && <PaymentsScreen onBack={() => setScreen('home')} />}
+      {screen === 'ai' && (
+  <AISymptomCheckerScreen
+    onBack={() => setScreen('home')}
+    onBookDoctor={() => setScreen('booking')}
+  />
+)}
+      {screen === 'emergency' && <EmergencyScreen onBack={() => setScreen('home')} />}
+      {screen === 'deployment' && <DeploymentScreen onBack={() => setScreen('home')} />}
       {screen === 'moduleHub' && <ModuleHubScreen onBack={() => setScreen('home')} onOpenMarketplace={() => setScreen('marketplace')} onOpenDoctors={() => setScreen('doctors')} onOpenRegistration={() => setScreen('registration')} onOpenOcr={() => setScreen('ocr')} onOpenBooking={() => setScreen('booking')} onOpenToken={() => setScreen('token')} onOpenQueue={() => setScreen('queue')} onOpenReception={() => setScreen('reception')} onOpenDoctorDashboard={() => setScreen('doctorDashboard')} onOpenHospitalAdmin={() => setScreen('hospitalAdmin')} onOpenPartner={() => setScreen('partner')} onOpenSuperAdmin={() => setScreen('superAdmin')} onOpenRecords={() => setScreen('records')} onOpenPayments={() => setScreen('payments')} onOpenAi={() => setScreen('ai')} onOpenEmergency={() => setScreen('emergency')} onOpenDeployment={() => setScreen('deployment')} />}
     </ThemeProvider>
   );

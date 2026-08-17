@@ -1,75 +1,259 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useTheme } from '../theme/ThemeContext';
-import Card from '../components/Card';
-import Button from '../components/Button';
-import StatusBanner from '../components/StatusBanner';
-import { doc, onSnapshot } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  limit,
+} from "firebase/firestore";
+
 import { db } from "../services/firebase";
+import { useTheme } from "../theme/ThemeContext";
 
-export default function LiveQueueScreen() {
-  const [currentToken, setCurrentToken] = useState("A001");
-const [currentNumber, setCurrentNumber] = useState(1);
+import Card from "../components/Card";
+import Button from "../components/Button";
+import StatusBanner from "../components/StatusBanner";
+import HeaderBar from "../components/HeaderBar";
+
+type Props = {
+  onBack?: () => void;
+};
+
+export default function LiveQueueScreen({ onBack }: Props = {}) {
   const { colors } = useTheme();
- 
-  const [yourToken, setYourToken] = useState('A-204');
-  const [patientsAhead, setPatientsAhead] = useState(4);
-  const [waitingTime, setWaitingTime] = useState('18 mins');
-  const [message, setMessage] = useState('');
 
- useEffect(() => {
-  const unsubscribe = onSnapshot(
-    doc(db, "liveQueue", "Apollo"),
-    (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
+  const [appointment, setAppointment] = useState<any>(null);
+  const [queuePosition, setQueuePosition] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
-        setCurrentToken(data.currentNumber);
-        setCurrentNumber(data.currentToken);
+  const loadQueue = async () => {
+    try {
+      setLoading(true);
+
+      const q = query(
+        collection(db, "appointments"),
+        orderBy("createdAt", "desc"),
+        limit(20)
+      );
+
+      const snapshot = await getDocs(q);
+
+      const appointments = snapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      }));
+
+      if (appointments.length > 0) {
+        const latest = appointments[0];
+
+        setAppointment(latest);
+
+        const position =
+          appointments.findIndex(
+            (item) => item.id === latest.id
+          ) + 1;
+
+        setQueuePosition(position || 1);
+
+        setMessage("✅ Live queue updated.");
+      } else {
+        setMessage("No active appointments found.");
       }
+    } catch (error) {
+      console.log("Queue error:", error);
+      setMessage("❌ Unable to load live queue.");
+    } finally {
+      setLoading(false);
     }
-  );
-
-  return unsubscribe;
-}, []);
-
-  const refreshQueue = () => {
-    setCurrentToken(`A-${Math.floor(100 + Math.random() * 900)}`);
-    setYourToken('A-204');
-    setPatientsAhead(4);
-    setWaitingTime('18 mins');
-    setMessage('Queue synchronized successfully.');
   };
-  useEffect(() => {
-  const interval = setInterval(() => {
-    setPatientsAhead((prev) => Math.max(0, prev - 1));
-  }, 8000);
 
-  return () => clearInterval(interval);
-}, []);
+  useEffect(() => {
+    loadQueue();
+  }, []);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}> 
-      <Text style={[styles.title, { color: colors.text }]}>Live Queue</Text>
-      <Text style={[styles.subtitle, { color: colors.muted }]}>Track your live position, the current token being served, and the estimated wait in real time.</Text>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <HeaderBar
+        title="Live Queue"
+        subtitle="Track your OPD position"
+        onBack={onBack}
+      />
 
-      {message ? <StatusBanner message={message} tone="success" /> : null}
+      <ScrollView
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        {message ? (
+          <StatusBanner
+            message={message}
+            tone="info"
+          />
+        ) : null}
 
-      <Card style={styles.card}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Current Token</Text>
-        <Text style={[styles.token, { color: colors.primary }]}>{currentToken}</Text>
-        <Text style={[styles.meta, { color: colors.muted }]}>Your Token: {yourToken}</Text>
-        <Text style={[styles.meta, { color: colors.muted }]}>Patients Ahead: {patientsAhead}</Text>
-        <Text style={[styles.meta, { color: colors.muted }]}>Estimated Waiting Time: {waitingTime}</Text>
-      </Card>
+        {loading ? (
+          <Text
+            style={[
+              styles.loading,
+              { color: colors.muted },
+            ]}
+          >
+            Loading live queue...
+          </Text>
+        ) : appointment ? (
+          <>
+            {/* TOKEN */}
 
-      <Card style={styles.card}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Reception Synchronization</Text>
-        <Text style={[styles.meta, { color: colors.muted }]}>Queue updated live with reception panel and hospital display screen.</Text>
-      </Card>
+            <Card style={styles.tokenCard}>
+              <Text style={styles.tokenLabel}>
+                🎟 YOUR TOKEN
+              </Text>
 
-      <Button title="Refresh Queue" onPress={refreshQueue} />
-    </ScrollView>
+              <Text
+                style={[
+                  styles.token,
+                  { color: colors.primary },
+                ]}
+              >
+                {appointment.tokenNumber || "N/A"}
+              </Text>
+
+              <Text
+                style={[
+                  styles.status,
+                  { color: colors.primary },
+                ]}
+              >
+                ● {appointment.status || "confirmed"}
+              </Text>
+            </Card>
+
+            {/* QUEUE POSITION */}
+
+            <Card style={styles.queueCard}>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: colors.text },
+                ]}
+              >
+                🔄 Current Queue
+              </Text>
+
+              <Text
+                style={[
+                  styles.position,
+                  { color: colors.primary },
+                ]}
+              >
+                #{queuePosition}
+              </Text>
+
+              <Text
+                style={[
+                  styles.positionLabel,
+                  { color: colors.muted },
+                ]}
+              >
+                Your Queue Position
+              </Text>
+            </Card>
+
+            {/* DOCTOR */}
+
+            <Card style={styles.card}>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: colors.text },
+                ]}
+              >
+                👨‍⚕️ Doctor Information
+              </Text>
+
+              <Text style={styles.info}>
+                Doctor: {appointment.doctorName || "N/A"}
+              </Text>
+
+              <Text style={styles.info}>
+                🩺 Department:{" "}
+                {appointment.department || "N/A"}
+              </Text>
+
+              <Text style={styles.info}>
+                🏥 Hospital:{" "}
+                {appointment.hospitalName || "N/A"}
+              </Text>
+
+              <Text style={styles.info}>
+                📅 Date: {appointment.date || "N/A"}
+              </Text>
+
+              <Text style={styles.info}>
+                ⏰ Time: {appointment.time || "N/A"}
+              </Text>
+            </Card>
+
+            {/* QUEUE STATUS */}
+
+            <Card style={styles.card}>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: colors.text },
+                ]}
+              >
+                📢 Queue Status
+              </Text>
+
+              <Text
+                style={[
+                  styles.queueMessage,
+                  { color: colors.text },
+                ]}
+              >
+                Please stay available. You will be
+                notified when your turn approaches.
+              </Text>
+            </Card>
+
+            <Button
+              title="🔄 Refresh Queue"
+              onPress={loadQueue}
+            />
+          </>
+        ) : (
+          <Card style={styles.card}>
+            <Text
+              style={[
+                styles.empty,
+                { color: colors.muted },
+              ]}
+            >
+              No active appointment found.
+            </Text>
+          </Card>
+        )}
+
+        <View style={{ height: 30 }} />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -78,31 +262,76 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    marginBottom: 6,
+
+  loading: {
+    textAlign: "center",
+    marginTop: 30,
+    fontSize: 15,
   },
-  subtitle: {
+
+  tokenCard: {
+    marginTop: 20,
+    alignItems: "center",
+    padding: 25,
+  },
+
+  tokenLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#64748B",
+  },
+
+  token: {
+    fontSize: 50,
+    fontWeight: "900",
+    marginVertical: 10,
+  },
+
+  status: {
     fontSize: 14,
-    marginBottom: 14,
-    lineHeight: 20,
+    fontWeight: "700",
   },
-  card: {
+
+  queueCard: {
+    marginTop: 15,
+    alignItems: "center",
+    padding: 25,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "800",
     marginBottom: 12,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 8,
+
+  position: {
+    fontSize: 48,
+    fontWeight: "900",
   },
-  token: {
-    fontSize: 30,
-    fontWeight: '800',
-    marginBottom: 6,
-  },
-  meta: {
+
+  positionLabel: {
     fontSize: 14,
     marginTop: 4,
+  },
+
+  card: {
+    marginTop: 15,
+    marginBottom: 10,
+  },
+
+  info: {
+    fontSize: 15,
+    marginTop: 8,
+    color: "#475569",
+  },
+
+  queueMessage: {
+    fontSize: 14,
+    lineHeight: 21,
+  },
+
+  empty: {
+    textAlign: "center",
+    fontSize: 15,
   },
 });
