@@ -17,14 +17,22 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.sinwer.kavachhealthcom.sinwer.kavachhealth"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-status-bar",
-      "expo-sharing"
-    ]
+      "expo-sharing",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6863ba7d-d5cc-47e3-8ef2-90bbd3a88aba"
+      }
+    },
+    "owner": "sinwer"
   }
 }
